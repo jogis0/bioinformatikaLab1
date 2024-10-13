@@ -106,13 +106,13 @@ def get_frequency_from_file(filename):
     return seq_frequencies
 
 
-def calculate_key_distance(freq1, freq2):
-    all_keys = set(freq1.keys()).union(set(freq2.keys()))
+def calculate_key_distance(dict1, dict2):
+    all_keys = set(dict1.keys()).union(set(dict2.keys()))
     distance = 0.0
 
     for key in all_keys:
-        freq1 = freq1.get(key, 0.0)
-        freq2 = freq2.get(key, 0.0)
+        freq1 = dict1.get(key, 0.0)
+        freq2 = dict2.get(key, 0.0)
 
         distance += (freq1 - freq2) ** 2
 
@@ -126,9 +126,31 @@ def calculate_distance(sequence1_freq, sequence2_freq):
     return (codon_distance + dicodon_distance) / 2
 
 
-bacterial1_freq = get_frequency_from_file("bacterial1.fasta")
-bacterial2_freq = get_frequency_from_file("bacterial2.fasta")
-print(calculate_distance(bacterial1_freq, bacterial2_freq))
-# surasti daznius ✓
-# pagal daznius apskaiciuoti atstuma pagal random kazkokia funkcija [ Distance(A, B) sqrt(sum(i=1, n)(Ai - Bi)^2) ] ✓
-# atstumai yra tarp failu
+def create_distance_matrix(sequence_dicts):
+    sequences = list(sequence_dicts.keys())
+    num_sequences = len(sequences)
+
+    distance_matrix = [[0.0 for _ in range(num_sequences)] for _ in range(num_sequences)]
+
+    for i in range(num_sequences):
+        for j in range(i, num_sequences):
+            dist = calculate_distance(sequence_dicts[sequences[i]], sequence_dicts[sequences[j]])
+            distance_matrix[i][j] = dist
+            distance_matrix[j][i] = dist
+
+    phylip_output = f"{num_sequences}\n"
+    for i in range(num_sequences):
+        seq_name = os.path.splitext(sequences[i])[0].ljust(10)
+        distances = ' '.join(f"{distance_matrix[i][j]:.5f}" for j in range(num_sequences))
+        phylip_output += f"{seq_name} {distances}\n"
+
+    return phylip_output
+
+
+seq_dict = {}
+filenames = os.listdir(os.path.abspath(os.curdir) + os.path.sep + "data")
+for filename in filenames:
+    freq = get_frequency_from_file(filename)
+    seq_dict[filename] = freq
+
+print(create_distance_matrix(seq_dict))
