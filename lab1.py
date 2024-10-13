@@ -119,13 +119,6 @@ def calculate_key_distance(dict1, dict2):
     return math.sqrt(distance)
 
 
-def calculate_distance(sequence1_freq, sequence2_freq):
-    codon_distance = calculate_key_distance(sequence1_freq[0], sequence2_freq[0])
-    dicodon_distance = calculate_key_distance(sequence1_freq[1], sequence2_freq[1])
-
-    return (codon_distance + dicodon_distance) / 2
-
-
 def create_distance_matrix(sequence_dicts):
     sequences = list(sequence_dicts.keys())
     num_sequences = len(sequences)
@@ -134,7 +127,7 @@ def create_distance_matrix(sequence_dicts):
 
     for i in range(num_sequences):
         for j in range(i, num_sequences):
-            dist = calculate_distance(sequence_dicts[sequences[i]], sequence_dicts[sequences[j]])
+            dist = calculate_key_distance(sequence_dicts[sequences[i]], sequence_dicts[sequences[j]])
             distance_matrix[i][j] = dist
             distance_matrix[j][i] = dist
 
@@ -147,10 +140,14 @@ def create_distance_matrix(sequence_dicts):
     return phylip_output
 
 
-seq_dict = {}
+codon_seq_dict = {}
+dicodon_seq_dict = {}
 filenames = os.listdir(os.path.abspath(os.curdir) + os.path.sep + "data")
 for filename in filenames:
     freq = get_frequency_from_file(filename)
-    seq_dict[filename] = freq
-
-print(create_distance_matrix(seq_dict))
+    codon_seq_dict[filename] = freq[0]
+    dicodon_seq_dict[filename] = freq[1]
+print("Codon matrix")
+print(create_distance_matrix(codon_seq_dict))
+print("Dicodon matrix")
+print(create_distance_matrix(dicodon_seq_dict))
