@@ -145,9 +145,12 @@ dicodon_seq_dict = {}
 filenames = os.listdir(os.path.abspath(os.curdir) + os.path.sep + "data")
 for filename in filenames:
     freq = get_frequency_from_file(filename)
+    print(filename)
+    print(freq[0])
+    print(freq[1])
     codon_seq_dict[filename] = freq[0]
     dicodon_seq_dict[filename] = freq[1]
-print("Codon matrix")
-print(create_distance_matrix(codon_seq_dict))
-print("Dicodon matrix")
-print(create_distance_matrix(dicodon_seq_dict))
+# print("Codon matrix")
+# print(create_distance_matrix(codon_seq_dict))
+# print("Dicodon matrix")
+# print(create_distance_matrix(dicodon_seq_dict))
